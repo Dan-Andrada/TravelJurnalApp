@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "193251872786",
+    "project_id": "traveljurnal-b0b34",
+    "storage_bucket": "traveljurnal-b0b34.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:193251872786:android:5243e3c90a96e0abbd48cb",
+        "android_client_info": {
+          "package_name": "com.example.traveljurnalapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDo_qV9FapssThsc9Sx-LKlofb17FFCOJ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
