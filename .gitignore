@@ -1,15 +1,32 @@
+# IntelliJ / Android Studio
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+.idea/
+.idea/*
+
+# Gradle
+.gradle/
+build/
+*/build/
+captures/
+externalNativeBuild/
+.cxx/
+
+# Firebase (keep sensitive files local)
+google-services.json
+app/google-services.json
+app/src/**/google-services.json
+
+# Local properties and test output
 local.properties
+*.log
+/test-results/
+
+# OS
+.DS_Store
+
+# Keystores and secrets
+*.jks
+*.keystore
+*.pem
+*.p12
+*.key
