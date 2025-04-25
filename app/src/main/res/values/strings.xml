@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TravelJurnalApp</string>
+    <string name="search_a_place">Search a place</string>
 </resources>
