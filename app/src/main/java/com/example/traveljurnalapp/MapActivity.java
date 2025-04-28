@@ -15,6 +15,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.List;
@@ -62,5 +63,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMaps = googleMap;
         LatLng defaultLoc = new LatLng(48.8584, 2.2945); // Eiffel Tower
         mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLoc, 4));
+
+        mMaps.setOnMapClickListener(latLng -> {
+            VisitedDialogFragment dialogFragment = new VisitedDialogFragment(latLng, new VisitedDialogFragment.OnVisitedListener() {
+                @Override
+                public void onVisitedConfirmed(LatLng location) {
+                    mMaps.addMarker(new MarkerOptions()
+                            .position(location)
+                            .title("Visited"));
+                }
+            });
+            dialogFragment.show(getSupportFragmentManager(), "VisitedDialog");
+        });
     }
+
 }
