@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -11,21 +13,48 @@
             android:id="@+id/dialogTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mark place as visited?"
+            android:text="Would you like to mark\nthis place as visited?"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:textColor="@color/brownTextColor"
             android:layout_marginBottom="16dp"/>
 
-    <Button
-            android:id="@+id/yesButton"
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Yes" />
+            android:layout_height="wrap_content">
 
-    <Button
-            android:id="@+id/noButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="No"
-            android:layout_marginTop="8dp"/>
+        <Button
+                android:id="@+id/noButton"
+                android:layout_width="48dp"
+                android:layout_height="37dp"
+                android:text="@string/no"
+                android:textStyle="bold"
+                android:textColor="@color/brownTextColor"
+                app:layout_constraintEnd_toStartOf="@+id/yesButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                tools:ignore="MissingConstraints"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="11dp"
+                android:background="#F5F4EE" />
+
+        <Button
+                android:id="@+id/yesButton"
+                android:layout_width="55dp"
+                android:layout_height="37dp"
+                android:text="@string/yes"
+                android:textStyle="bold"
+                android:textColor="@color/brownTextColor"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:ignore="MissingConstraints"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="11dp"
+                android:layout_marginStart="80dp"
+                app:layout_constraintStart_toEndOf="@+id/noButton"
+                android:background="#F5F4EE" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </LinearLayout>
