@@ -39,11 +39,13 @@ dependencies {
     implementation libs.androidx.core.v1120
     implementation libs.androidx.appcompat.v161
     implementation libs.material.v1110
+
     implementation libs.play.services.maps
+    implementation libs.places
 
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit.v115
     androidTestImplementation libs.androidx.espresso.core.v351
 
-    implementation libs.play.services.maps
+//    implementation libs.play.services.maps
 }
