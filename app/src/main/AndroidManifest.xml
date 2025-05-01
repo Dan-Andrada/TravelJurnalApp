@@ -29,6 +29,7 @@
         <activity android:name=".MapActivity" android:exported="true" />
         <activity android:name=".RegisterActivity" android:exported="true"/>
         <activity android:name=".LoginActivity" android:exported="true"/>
+        <activity android:name=".TripDetailsActivity" android:exported="true" />
 
     </application>
 

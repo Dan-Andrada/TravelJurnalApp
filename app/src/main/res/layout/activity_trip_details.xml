@@ -1,0 +1,132 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#d9b49c">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tripTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your trip to Antalya:"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:textColor="#4B2E2E" />
+
+        <TextView
+            android:id="@+id/tripDates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10 March - 16 March 2025"
+            android:textStyle="italic"
+            android:textColor="#885544"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/moneySpent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="• Money spent: 1000 $"
+            android:padding="12dp"
+            android:textSize="18sp"
+            android:textColor="#3D3D3D"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/categoryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="• Category: City"
+            android:padding="12dp"
+            android:textSize="18sp"
+            android:textColor="#3D3D3D"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="• Your thoughts about this trip"
+                android:textColor="#3D3D3D"
+                android:padding="12dp"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/notePreview"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="It was a beautiful trip full of sunshine and..."
+                android:textColor="#3D3D3D"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/viewNoteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/rounded_button"
+                android:text="View"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="• Photos:"
+            android:padding="12dp"
+            android:textSize="18sp"
+            android:textColor="#3D3D3D"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/addPhotoButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_add_photo"
+                android:background="@null"
+                android:contentDescription="Add photo" />
+
+            <Button
+                android:id="@+id/newAlbumButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Album"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/rounded_button"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <GridLayout
+            android:id="@+id/photosGrid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="3"
+            android:orientation="horizontal"
+            android:alignmentMode="alignMargins"
+            android:rowOrderPreserved="false"
+            android:useDefaultMargins="true" />
+
+    </LinearLayout>
+</ScrollView>
