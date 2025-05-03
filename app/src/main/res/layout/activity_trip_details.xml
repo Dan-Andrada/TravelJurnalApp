@@ -1,100 +1,103 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#d9b49c">
+    android:background="#FDE2E2"
+    android:padding="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="24dp">
 
         <TextView
             android:id="@+id/tripTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Your trip to Antalya:"
+            android:text="Your trip to Antalya"
+            android:textSize="26sp"
             android:textStyle="bold"
-            android:textSize="22sp"
-            android:textColor="#4B2E2E" />
+            android:textColor="#4A2F2F"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginBottom="4dp"/>
 
         <TextView
             android:id="@+id/tripDates"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="10 March - 16 March 2025"
+            android:textSize="15sp"
             android:textStyle="italic"
-            android:textColor="#885544"
-            android:layout_marginBottom="16dp" />
+            android:textColor="#8E5D52"
+            android:fontFamily="sans-serif"
+            android:layout_marginBottom="16dp"/>
 
         <TextView
             android:id="@+id/moneySpent"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="• Money spent: 1000 $"
-            android:padding="12dp"
+            android:text="💸 Money spent: 1000 $"
             android:textSize="18sp"
-            android:textColor="#3D3D3D"
-            android:layout_marginBottom="16dp" />
+            android:textColor="#3C3C3C"
+            android:layout_marginBottom="16dp"/>
 
         <TextView
             android:id="@+id/categoryText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📍 Category: City"
+            android:textSize="18sp"
+            android:textColor="#3C3C3C"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="• Category: City"
-            android:padding="12dp"
+            android:text="📝 Your thoughts"
             android:textSize="18sp"
-            android:textColor="#3D3D3D"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#4B2E2E"
+            android:layout_marginBottom="6dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="• Your thoughts about this trip"
-                android:textColor="#3D3D3D"
-                android:padding="12dp"
-                android:textSize="18sp" />
+            android:layout_marginBottom="20dp">
 
             <TextView
                 android:id="@+id/notePreview"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:ellipsize="end"
                 android:maxLines="1"
-                android:text="It was a beautiful trip full of sunshine and..."
-                android:textColor="#3D3D3D"
-                android:textSize="16sp" />
+                android:ellipsize="end"
+                android:text="Write your thoughts here..."
+                android:textSize="16sp"
+                android:textColor="#666666"
+                android:fontFamily="sans-serif"/>
 
             <Button
                 android:id="@+id/viewNoteButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
+                android:text="View all"
+                android:textColor="#FFFFFF"
                 android:background="@drawable/rounded_button"
-                android:text="View"
-                android:textColor="#000000" />
+                android:layout_marginStart="12dp"/>
         </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="• Photos:"
-            android:padding="12dp"
+            android:text="Photos"
             android:textSize="18sp"
-            android:textColor="#3D3D3D"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#4B2E2E"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="sans-serif-medium"/>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="16dp"
@@ -115,7 +118,7 @@
                 android:text="New Album"
                 android:layout_marginStart="16dp"
                 android:background="@drawable/rounded_button"
-                android:textColor="#000000" />
+                android:textColor="#FFFFFF" />
         </LinearLayout>
 
         <GridLayout
@@ -127,6 +130,5 @@
             android:alignmentMode="alignMargins"
             android:rowOrderPreserved="false"
             android:useDefaultMargins="true" />
-
     </LinearLayout>
 </ScrollView>

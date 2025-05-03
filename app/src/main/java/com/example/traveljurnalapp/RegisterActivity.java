@@ -2,6 +2,7 @@ package com.example.traveljurnalapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -59,6 +60,23 @@ public class RegisterActivity extends AppCompatActivity {
 
         if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(this, "Invalid email format", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (password.length() < 6) {
+            Toast.makeText(this, "Password must be at least 6 characters long", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String passwordPattern = "(.*[A-Z].*)(.*[0-9].*)";
+
+        if (!password.matches(passwordPattern)) {
+            Toast.makeText(this, "Password must contain at least one uppercase letter and one number", Toast.LENGTH_SHORT).show();
             return;
         }
 

@@ -30,6 +30,8 @@
         <activity android:name=".RegisterActivity" android:exported="true"/>
         <activity android:name=".LoginActivity" android:exported="true"/>
         <activity android:name=".TripDetailsActivity" android:exported="true" />
+        <activity android:name=".NotesActivity" android:exported="true" />
+        <activity android:name=".ProfileActivity" android:exported="true" />
 
     </application>
 

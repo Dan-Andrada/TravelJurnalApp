@@ -23,6 +23,17 @@ public class TripDetailsActivity extends AppCompatActivity {
     private Date startDate, endDate;
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        String tripId = "antalya_2025";
+        String fullNote = NotesStorage.getNote(tripId);
+
+        String preview = fullNote.split("\n", 2)[0];
+        notePreview.setText(preview);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_details);
@@ -37,6 +48,7 @@ public class TripDetailsActivity extends AppCompatActivity {
         addPhotoButton = findViewById(R.id.addPhotoButton);
 
         //harcodat
+        String tripId = "antalya_2025";
         tripTitle.setText("Your trip to Antalya:");
         categoryText.setText("• Category: City");
         moneySpent.setText("• Money spent: 1000 $");
@@ -56,14 +68,17 @@ public class TripDetailsActivity extends AppCompatActivity {
         }
 
         //harcodat
-        String fullNote = "A fost super super.";
-        notePreview.setText(fullNote);
+        String fullNote = NotesStorage.getNote(tripId);
+        String preview = fullNote.split("\n", 2)[0];
+
+        notePreview.setText("• " + preview);
 
         viewNoteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(TripDetailsActivity.this, MapActivity.class);
-                intent.putExtra("noteText", fullNote);
+                Intent intent = new Intent(TripDetailsActivity.this, NotesActivity.class);
+                intent.putExtra("tripId", "antalya_2025");
+                //intent.putExtra("tripId", fullNote);
                 startActivity(intent);
             }
         });
