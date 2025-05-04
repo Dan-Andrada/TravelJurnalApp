@@ -1,7 +1,10 @@
 package com.example.traveljurnalapp;
 
+import android.Manifest;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -12,6 +15,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -22,21 +27,24 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.AutocompletePrediction;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMaps;
     private EditText searchEditText;
-    private ImageButton searchButton;
+
+    private PlacesClient placesClient;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -45,13 +53,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
 
         searchEditText = findViewById(R.id.searchEditText);
-        searchButton = findViewById(R.id.searchMapButton);
+        ImageButton searchButton = findViewById(R.id.searchMapButton);
 
         if(!Places.isInitialized()){
             Places.initialize(getApplicationContext(),"AIzaSyAMsrR3jxgkvlaP-V3rzrLc6ZCf3ivtxLg");
         }
 
-        PlacesClient placesClient = Places.createClient(this);
+        placesClient = Places.createClient(this);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -75,18 +83,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                   Place place = fetchPlaceResponse.getPlace();
                                   if(place.getLatLng() != null){
                                       mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(),20));
-//                                      mMaps.addMarker(new MarkerOptions()
-//                                              .position(place.getLatLng())
-//                                              .title(place.getName()));
                                   }
                               });
                           } else {
                               Toast.makeText(this, "No results found", Toast.LENGTH_SHORT).show();
                           }
                        })
-                       .addOnFailureListener(e -> {
-                           Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                       });
+                       .addOnFailureListener(e -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
 
            }
         });
@@ -102,9 +105,33 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             VisitedDialogFragment dialogFragment = new VisitedDialogFragment(latLng, new VisitedDialogFragment.OnVisitedListener() {
                 @Override
                 public void onVisitedConfirmed(LatLng location) {
-                    mMaps.addMarker(new MarkerOptions()
-                            .position(location)
-                            .title("Visited"));
+                    Geocoder geocoder = new Geocoder(MapActivity.this, Locale.getDefault());
+
+                    try {
+                        List<Address> addresses = geocoder.getFromLocation(location.latitude,location.longitude,1);
+                        String placeName = "";
+                        if(!addresses.isEmpty()){
+                            Address address = addresses.get(0);
+
+                            //Try extracting city
+                            if (address.getLocality() != null) {
+                                placeName = address.getLocality(); // most common
+                            } else if (address.getSubAdminArea() != null) {
+                                placeName = address.getSubAdminArea(); // fallback
+                            } else if (address.getAdminArea() != null) {
+                                placeName = address.getAdminArea(); // broader fallback
+                            }
+
+                            Intent intent = new Intent(MapActivity.this, AddTripDetailsActivity.class);
+                            intent.putExtra("lat", location.latitude);
+                            intent.putExtra("lng", location.longitude);
+                            intent.putExtra("suggestedName", placeName);
+                            startActivity(intent);
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
             dialogFragment.show(getSupportFragmentManager(), "VisitedDialog");
@@ -115,14 +142,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == 100 && resultCode == RESULT_OK){
-            Place place = Autocomplete.getPlaceFromIntent(data);
-            if(place.getLatLng() != null){
-                mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(),15));
-                mMaps.addMarker(new MarkerOptions()
-                        .position(place.getLatLng())
-                        .title(place.getName()));
-            }
+        if(requestCode == 200 && resultCode == RESULT_OK && data != null){
+            double lat = data.getDoubleExtra("lat",0);
+            double lng = data.getDoubleExtra("lng",0);
+            String title = data.getStringExtra("title");
+
+            LatLng location = new LatLng(lat, lng);
+            mMaps.addMarker(new MarkerOptions().position(location).title(title));
+            mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 20));
         }
     }
 }
