@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace 'com.example.traveljurnalapp'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.example.traveljurnalapp"
@@ -32,20 +32,17 @@ android {
 
 dependencies {
     implementation platform(libs.firebase.bom)
-    implementation libs.google.firebase.analytics
-    implementation libs.google.firebase.auth
-    implementation libs.google.firebase.firestore
+    implementation libs.firebase.analytics
+    implementation libs.firebase.auth
+    implementation libs.firebase.firestore
 
-    implementation libs.androidx.core.v1120
+    implementation libs.androidx.core
     implementation libs.androidx.appcompat.v161
-    implementation libs.material.v1110
-
+    implementation libs.material
     implementation libs.play.services.maps
     implementation libs.places
 
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit.v115
     androidTestImplementation libs.androidx.espresso.core.v351
-
-//    implementation libs.play.services.maps
 }

@@ -127,7 +127,6 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         closeButton.setOnClickListener(v -> popupWindow.dismiss());
-
         popupWindow.setOnDismissListener(() -> {
             // ca atunci cand popup-ul dispare, sa stergem si blurul
             ((android.view.ViewGroup) parentView).removeView(blurBackground);
@@ -135,4 +134,6 @@ public class LoginActivity extends AppCompatActivity {
 
         popupWindow.showAtLocation(findViewById(android.R.id.content), android.view.Gravity.CENTER, 0, 0);
     }
+
 }
+
