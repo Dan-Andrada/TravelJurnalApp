@@ -1,10 +1,8 @@
 package com.example.traveljurnalapp;
 
-import android.Manifest;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -12,11 +10,12 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -27,12 +26,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.AutocompletePrediction;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.android.libraries.places.widget.Autocomplete;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -43,8 +39,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private GoogleMap mMaps;
     private EditText searchEditText;
-
     private PlacesClient placesClient;
+    private ActivityResultLauncher<Intent> tripDetailsLauncher;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -63,6 +59,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+
+        tripDetailsLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if(result.getResultCode() == RESULT_OK && result.getData() != null){
+                Intent data = result.getData();
+                double lat = data.getDoubleExtra("lat",0);
+                double lng = data.getDoubleExtra("lng",0);
+                String title = data.getStringExtra("title");
+
+                LatLng location = new LatLng(lat,lng);
+                mMaps.addMarker(new MarkerOptions().position(location).title(title));
+                mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(location,20));
+            }
+        });
+
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
@@ -126,7 +136,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             intent.putExtra("lat", location.latitude);
                             intent.putExtra("lng", location.longitude);
                             intent.putExtra("suggestedName", placeName);
-                            startActivity(intent);
+                            System.out.println("MapActivity:\nLat: "+ location.latitude + "\tLng: " + location.longitude);
+                            tripDetailsLauncher.launch(intent);
                         }
 
                     } catch (IOException e) {
@@ -142,14 +153,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == 200 && resultCode == RESULT_OK && data != null){
-            double lat = data.getDoubleExtra("lat",0);
+        assert data != null;
+        double lat = data.getDoubleExtra("lat",0);
             double lng = data.getDoubleExtra("lng",0);
             String title = data.getStringExtra("title");
 
             LatLng location = new LatLng(lat, lng);
             mMaps.addMarker(new MarkerOptions().position(location).title(title));
             mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 20));
-        }
     }
 }

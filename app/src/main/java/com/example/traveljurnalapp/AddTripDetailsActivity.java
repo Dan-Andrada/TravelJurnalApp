@@ -120,7 +120,7 @@ public class AddTripDetailsActivity extends AppCompatActivity {
             if (spending.isEmpty())
                 spending = "0";
 
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd", Locale.getDefault());
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
             Map<String, Object> tripDate = new HashMap<>();
             tripDate.put("placeName", placeName);
@@ -141,11 +141,13 @@ public class AddTripDetailsActivity extends AppCompatActivity {
                     .addOnSuccessListener(documentReference -> Toast.makeText(this, "Trip saved", Toast.LENGTH_SHORT).show())
                     .addOnFailureListener(e -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
 
-            Intent intent = new Intent(this, MapActivity.class);
+            Intent intent = new Intent();
             intent.putExtra("lat", lat);
             intent.putExtra("lng", lng);
             intent.putExtra("title", placeName);
-            startActivityForResult(intent,200);
+            System.out.println("TripDetails:\nLat: "+ lat + "\tLng: " + lng);
+            setResult(RESULT_OK,intent);
+            finish();
         });
     }
 
