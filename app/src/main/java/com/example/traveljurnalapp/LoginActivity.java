@@ -107,6 +107,7 @@ public class LoginActivity extends AppCompatActivity {
 
         EditText emailInput = popupView.findViewById(R.id.popup_email);
         Button sendButton = popupView.findViewById(R.id.popup_send_button);
+        TextView closeButton = popupView.findViewById(R.id.popup_close);
 
         sendButton.setOnClickListener(v -> {
             String email = emailInput.getText().toString().trim();
@@ -125,6 +126,7 @@ public class LoginActivity extends AppCompatActivity {
             popupWindow.dismiss();
         });
 
+        closeButton.setOnClickListener(v -> popupWindow.dismiss());
         popupWindow.setOnDismissListener(() -> {
             // ca atunci cand popup-ul dispare, sa stergem si blurul
             ((android.view.ViewGroup) parentView).removeView(blurBackground);
@@ -132,4 +134,6 @@ public class LoginActivity extends AppCompatActivity {
 
         popupWindow.showAtLocation(findViewById(android.R.id.content), android.view.Gravity.CENTER, 0, 0);
     }
+
 }
+

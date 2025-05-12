@@ -103,9 +103,9 @@ public class RegisterActivity extends AppCompatActivity {
                                     startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                                     finish();
                                 })
-                                .addOnFailureListener(e ->
-                                        Toast.makeText(this, "Error saving data: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-//                                        user.delete();
+                                .addOnFailureListener(e -> {
+                                        user.delete();
+                                        Toast.makeText(this, "Error saving data: " + e.getMessage(), Toast.LENGTH_SHORT).show(); });
                     } else {
                         Toast.makeText(this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
