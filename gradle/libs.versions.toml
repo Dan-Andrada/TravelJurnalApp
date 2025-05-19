@@ -4,6 +4,7 @@ androidxJunit = "1.1.5"
 appcompatVersion = "1.6.1"
 espressoCoreVersion = "3.5.1"
 firebaseBom = "33.12.0"
+googleMaterial = "1.11.0"
 kotlin = "2.0.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -15,6 +16,9 @@ composeBom = "2024.09.00"
 appcompat = "1.7.0"
 material = "1.12.0"
 firebaseFirestore = "25.1.3"
+materialCalendarview = "2.0.1"
+materialCalendarviewVersion = "1.4.3"
+materialVersion = "1.10.0"
 playServicesMaps = "19.2.0"
 places = "4.2.0"
 
@@ -43,6 +47,10 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+material-calendarview = { module = "com.prolificinteractive:material-calendarview", version.ref = "materialCalendarview" }
+material-calendarview-v143 = { module = "com.prolificinteractive:material-calendarview", version.ref = "materialCalendarviewVersion" }
+material-v1100 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
+material-v1110 = { module = "com.google.android.material:material", version.ref = "googleMaterial" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 places = { group = "com.google.android.libraries.places", name = "places", version.ref = "places" }
 

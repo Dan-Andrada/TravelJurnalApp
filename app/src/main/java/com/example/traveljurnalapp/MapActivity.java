@@ -1,13 +1,19 @@
 package com.example.traveljurnalapp;
 
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -29,6 +35,10 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -41,6 +51,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private EditText searchEditText;
     private PlacesClient placesClient;
     private ActivityResultLauncher<Intent> tripDetailsLauncher;
+    private ImageButton menuButton;
+    private LinearLayout menuLayout;
+    private TextView accountInfo, tripsHistory;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -65,11 +78,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 Intent data = result.getData();
                 double lat = data.getDoubleExtra("lat",0);
                 double lng = data.getDoubleExtra("lng",0);
-                String title = data.getStringExtra("title");
+//                String title = data.getStringExtra("title");
 
                 LatLng location = new LatLng(lat,lng);
-                mMaps.addMarker(new MarkerOptions().position(location).title(title));
-                mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(location,20));
+//                mMaps.addMarker(new MarkerOptions().position(location).title(title));
+                mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(location,15));
             }
         });
 
@@ -92,7 +105,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                               placesClient.fetchPlace(placeRequest).addOnSuccessListener(fetchPlaceResponse -> {
                                   Place place = fetchPlaceResponse.getPlace();
                                   if(place.getLatLng() != null){
-                                      mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(),20));
+                                      mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(),15));
                                   }
                               });
                           } else {
@@ -103,13 +116,55 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
            }
         });
+
+        menuButton = findViewById(R.id.menu);
+        menuLayout = findViewById(R.id.menuLayout);
+        accountInfo = findViewById(R.id.accountInfo);
+        tripsHistory = findViewById(R.id.tripsHistory);
+
+        menuButton.setOnClickListener(view -> {
+            if(menuLayout.getVisibility() == VISIBLE){
+                menuLayout.setVisibility(GONE);
+            } else {
+                menuLayout.setVisibility(VISIBLE);
+            }
+        });
+
+        accountInfo.setOnClickListener(view -> {
+            startActivity(new Intent(MapActivity.this,ProfileActivity.class));
+            menuLayout.setVisibility(GONE);
+        });
+
+        tripsHistory.setOnClickListener(view -> {
+            startActivity(new Intent(MapActivity.this, NotesActivity.class));
+        });
     }
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMaps = googleMap;
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
         LatLng defaultLoc = new LatLng(48.8584, 2.2945); // Eiffel Tower
         mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLoc, 4));
+
+        db.collection("users")
+                .document(user.getUid())
+                .collection("trips")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots){
+                        double lat = doc.getDouble("lat");
+                        double lng = doc.getDouble("lng");
+                        String placeName = doc.getString("placeName");
+
+                        LatLng tripLocation = new LatLng(lat,lng);
+                        mMaps.addMarker(new MarkerOptions().position(tripLocation).title(placeName));
+                    }
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load saved trips", Toast.LENGTH_SHORT).show());
+
 
         mMaps.setOnMapClickListener(latLng -> {
             VisitedDialogFragment dialogFragment = new VisitedDialogFragment(latLng, new VisitedDialogFragment.OnVisitedListener() {
@@ -153,13 +208,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        assert data != null;
+//        assert data != null;
         double lat = data.getDoubleExtra("lat",0);
             double lng = data.getDoubleExtra("lng",0);
             String title = data.getStringExtra("title");
 
             LatLng location = new LatLng(lat, lng);
             mMaps.addMarker(new MarkerOptions().position(location).title(title));
-            mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 20));
+            mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
     }
 }

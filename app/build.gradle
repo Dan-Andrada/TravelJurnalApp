@@ -41,8 +41,11 @@ dependencies {
     implementation libs.material
     implementation libs.play.services.maps
     implementation libs.places
+    implementation libs.material.v1110
+
 
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit.v115
     androidTestImplementation libs.androidx.espresso.core.v351
 }
+
