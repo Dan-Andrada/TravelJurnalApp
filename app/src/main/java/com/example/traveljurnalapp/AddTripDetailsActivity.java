@@ -3,12 +3,15 @@ package com.example.traveljurnalapp;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -36,6 +39,8 @@ public class AddTripDetailsActivity extends AppCompatActivity {
     Button selectedBtn = null;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private String temporaryNote = "";
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,7 +49,6 @@ public class AddTripDetailsActivity extends AppCompatActivity {
 
         spendingInput = findViewById(R.id.spendingInput);
         placeNameInput = findViewById(R.id.placeNameInput);
-
         uploadPhotoButton = findViewById(R.id.uploadPhotoButton);
         notesButton = findViewById(R.id.notesButton);
         doneButton = findViewById(R.id.doneButton);
@@ -52,30 +56,29 @@ public class AddTripDetailsActivity extends AppCompatActivity {
         btnHotel = findViewById(R.id.btnHotel);
         btnActivity = findViewById(R.id.btnActivity);
         btnMuseum = findViewById(R.id.btnMuseum);
-
         calendarView = findViewById(R.id.calendarView);
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
         String suggestedName = getIntent().getStringExtra("suggestedName");
-        if(suggestedName != null){
+        if (suggestedName != null) {
             placeNameInput.setText(suggestedName);
         }
 
-        double lat = getIntent().getDoubleExtra("lat",0);
-        double lng = getIntent().getDoubleExtra("lng",0);
+        double lat = getIntent().getDoubleExtra("lat", 0);
+        double lng = getIntent().getDoubleExtra("lng", 0);
 
         calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
             Calendar selectedCal = Calendar.getInstance();
-            selectedCal.set(year,month,dayOfMonth);
+            selectedCal.set(year, month, dayOfMonth);
             Date pickedDate = selectedCal.getTime();
 
-            if(selectingStart){
+            if (selectingStart) {
                 startDate = pickedDate;
-                Toast.makeText(this,"Start date selected",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Start date selected", Toast.LENGTH_SHORT).show();
             } else {
-                if(startDate != null && pickedDate.after(startDate)){
+                if (startDate != null && pickedDate.after(startDate)) {
                     endDate = pickedDate;
                     Toast.makeText(this, "End date selected", Toast.LENGTH_SHORT).show();
                 } else {
@@ -85,17 +88,14 @@ public class AddTripDetailsActivity extends AppCompatActivity {
             selectingStart = !selectingStart;
         });
 
-
-
-        View.OnClickListener typeClickListener = view ->{
-
+        View.OnClickListener typeClickListener = view -> {
             Button clickedBtn = (Button) view;
-            if(selectedBtn == clickedBtn){
+            if (selectedBtn == clickedBtn) {
                 clickedBtn.setBackgroundResource(R.color.screenBg);
                 selectedBtn = null;
                 type = "trip";
             } else {
-                if(selectedBtn != null)
+                if (selectedBtn != null)
                     selectedBtn.setBackgroundResource(R.color.screenBg);
 
                 clickedBtn.setBackgroundResource(R.drawable.button_selected);
@@ -109,11 +109,32 @@ public class AddTripDetailsActivity extends AppCompatActivity {
         btnActivity.setOnClickListener(typeClickListener);
         btnMuseum.setOnClickListener(typeClickListener);
 
+        ActivityResultLauncher<Intent> notesLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        temporaryNote = result.getData().getStringExtra("note");
+                    }
+                }
+        );
+
+        notesButton.setOnClickListener(view -> {
+            Intent intent = new Intent(AddTripDetailsActivity.this, NotesActivity.class);
+            intent.putExtra("tempNote", temporaryNote);
+            notesLauncher.launch(intent);
+        });
+
         doneButton.setOnClickListener(v -> {
             String placeName = placeNameInput.getText().toString().trim();
 
-            if(startDate == null){
+            if (placeName.isEmpty()) {
+                Toast.makeText(this, "Please enter a place name", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (startDate == null) {
                 Toast.makeText(this, "Please select a start date", Toast.LENGTH_SHORT).show();
+                return;
             }
 
             String spending = spendingInput.getText().toString().trim();
@@ -122,33 +143,35 @@ public class AddTripDetailsActivity extends AppCompatActivity {
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-            Map<String, Object> tripDate = new HashMap<>();
-            tripDate.put("placeName", placeName);
-            tripDate.put("startDate", simpleDateFormat.format(startDate));
-            if(endDate != null){
-                tripDate.put("endDate", simpleDateFormat.format(endDate));
+            Map<String, Object> tripData = new HashMap<>();
+            tripData.put("placeName", placeName);
+            tripData.put("startDate", simpleDateFormat.format(startDate));
+            if (endDate != null) {
+                tripData.put("endDate", simpleDateFormat.format(endDate));
             }
-            tripDate.put("spending", Double.parseDouble(spending));
-            tripDate.put("type",type);
+            tripData.put("spending", Double.parseDouble(spending));
+            tripData.put("type", type);
+            tripData.put("note", temporaryNote);
 
             FirebaseUser user = mAuth.getCurrentUser();
-
             assert user != null;
+
             db.collection("users")
                     .document(user.getUid())
                     .collection("trips")
-                    .add(tripDate)
-                    .addOnSuccessListener(documentReference -> Toast.makeText(this, "Trip saved", Toast.LENGTH_SHORT).show())
-                    .addOnFailureListener(e -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                    .add(tripData)
+                    .addOnSuccessListener(documentReference -> {
+                        Toast.makeText(this, "Trip saved", Toast.LENGTH_SHORT).show();
 
-            Intent intent = new Intent();
-            intent.putExtra("lat", lat);
-            intent.putExtra("lng", lng);
-            intent.putExtra("title", placeName);
-            System.out.println("TripDetails:\nLat: "+ lat + "\tLng: " + lng);
-            setResult(RESULT_OK,intent);
-            finish();
+                        Intent intent = new Intent();
+                        intent.putExtra("lat", lat);
+                        intent.putExtra("lng", lng);
+                        intent.putExtra("title", placeName);
+                        setResult(RESULT_OK, intent);
+                        finish();
+                    })
+                    .addOnFailureListener(e ->
+                            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         });
     }
-
 }

@@ -1,6 +1,5 @@
 package com.example.traveljurnalapp;
 
-
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
@@ -17,7 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -64,8 +62,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         searchEditText = findViewById(R.id.searchEditText);
         ImageButton searchButton = findViewById(R.id.searchMapButton);
 
-        if(!Places.isInitialized()){
-            Places.initialize(getApplicationContext(),"AIzaSyAMsrR3jxgkvlaP-V3rzrLc6ZCf3ivtxLg");
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), "AIzaSyAMsrR3jxgkvlaP-V3rzrLc6ZCf3ivtxLg");
         }
 
         placesClient = Places.createClient(this);
@@ -74,15 +72,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
 
         tripDetailsLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if(result.getResultCode() == RESULT_OK && result.getData() != null){
+            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                 Intent data = result.getData();
-                double lat = data.getDoubleExtra("lat",0);
-                double lng = data.getDoubleExtra("lng",0);
-//                String title = data.getStringExtra("title");
-
-                LatLng location = new LatLng(lat,lng);
-//                mMaps.addMarker(new MarkerOptions().position(location).title(title));
-                mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(location,15));
+                double lat = data.getDoubleExtra("lat", 0);
+                double lng = data.getDoubleExtra("lng", 0);
+                LatLng location = new LatLng(lat, lng);
+                mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
             }
         });
 
@@ -90,31 +85,30 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         searchButton.setOnClickListener(v -> {
-           String query = searchEditText.getText().toString().trim();
-           if(!query.isEmpty()){
-               FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
-                                                            .setQuery(query).build();
-               placesClient.findAutocompletePredictions(request)
-                       .addOnSuccessListener(response -> {
-                          if(!response.getAutocompletePredictions().isEmpty()){
-                              AutocompletePrediction prediction = response.getAutocompletePredictions().get(0);
-                              String placeId = prediction.getPlaceId();
-                              List<Place.Field> placeFields = Arrays.asList(Place.Field.ID,Place.Field.NAME, Place.Field.LAT_LNG);
+            String query = searchEditText.getText().toString().trim();
+            if (!query.isEmpty()) {
+                FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
+                        .setQuery(query).build();
+                placesClient.findAutocompletePredictions(request)
+                        .addOnSuccessListener(response -> {
+                            if (!response.getAutocompletePredictions().isEmpty()) {
+                                AutocompletePrediction prediction = response.getAutocompletePredictions().get(0);
+                                String placeId = prediction.getPlaceId();
+                                List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG);
 
-                              FetchPlaceRequest placeRequest = FetchPlaceRequest.builder(placeId, placeFields).build();
-                              placesClient.fetchPlace(placeRequest).addOnSuccessListener(fetchPlaceResponse -> {
-                                  Place place = fetchPlaceResponse.getPlace();
-                                  if(place.getLatLng() != null){
-                                      mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(),15));
-                                  }
-                              });
-                          } else {
-                              Toast.makeText(this, "No results found", Toast.LENGTH_SHORT).show();
-                          }
-                       })
-                       .addOnFailureListener(e -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-
-           }
+                                FetchPlaceRequest placeRequest = FetchPlaceRequest.builder(placeId, placeFields).build();
+                                placesClient.fetchPlace(placeRequest).addOnSuccessListener(fetchPlaceResponse -> {
+                                    Place place = fetchPlaceResponse.getPlace();
+                                    if (place.getLatLng() != null) {
+                                        mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 15));
+                                    }
+                                });
+                            } else {
+                                Toast.makeText(this, "No results found", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(e -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            }
         });
 
         menuButton = findViewById(R.id.menu);
@@ -123,7 +117,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         tripsHistory = findViewById(R.id.tripsHistory);
 
         menuButton.setOnClickListener(view -> {
-            if(menuLayout.getVisibility() == VISIBLE){
+            if (menuLayout.getVisibility() == VISIBLE) {
                 menuLayout.setVisibility(GONE);
             } else {
                 menuLayout.setVisibility(VISIBLE);
@@ -131,12 +125,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
 
         accountInfo.setOnClickListener(view -> {
-            startActivity(new Intent(MapActivity.this,ProfileActivity.class));
+            startActivity(new Intent(MapActivity.this, ProfileActivity.class));
             menuLayout.setVisibility(GONE);
         });
 
         tripsHistory.setOnClickListener(view -> {
-            startActivity(new Intent(MapActivity.this, NotesActivity.class));
+            startActivity(new Intent(MapActivity.this, TripsHistoryActivity.class));
         });
     }
 
@@ -154,50 +148,47 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .collection("trips")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots){
-                        double lat = doc.getDouble("lat");
-                        double lng = doc.getDouble("lng");
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        Double latObj = doc.getDouble("lat");
+                        Double lngObj = doc.getDouble("lng");
                         String placeName = doc.getString("placeName");
 
-                        LatLng tripLocation = new LatLng(lat,lng);
-                        mMaps.addMarker(new MarkerOptions().position(tripLocation).title(placeName));
+                        if (latObj != null && lngObj != null && placeName != null) {
+                            LatLng tripLocation = new LatLng(latObj, lngObj);
+                            mMaps.addMarker(new MarkerOptions().position(tripLocation).title(placeName));
+                        } else {
+                            System.out.println("Ignored: " + doc.getId());
+                        }
                     }
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load saved trips", Toast.LENGTH_SHORT).show());
 
-
         mMaps.setOnMapClickListener(latLng -> {
-            VisitedDialogFragment dialogFragment = new VisitedDialogFragment(latLng, new VisitedDialogFragment.OnVisitedListener() {
-                @Override
-                public void onVisitedConfirmed(LatLng location) {
-                    Geocoder geocoder = new Geocoder(MapActivity.this, Locale.getDefault());
+            VisitedDialogFragment dialogFragment = new VisitedDialogFragment(latLng, location -> {
+                Geocoder geocoder = new Geocoder(MapActivity.this, Locale.getDefault());
 
-                    try {
-                        List<Address> addresses = geocoder.getFromLocation(location.latitude,location.longitude,1);
-                        String placeName = "";
-                        if(!addresses.isEmpty()){
-                            Address address = addresses.get(0);
+                try {
+                    List<Address> addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1);
+                    String placeName = "";
+                    if (!addresses.isEmpty()) {
+                        Address address = addresses.get(0);
 
-                            //Try extracting city
-                            if (address.getLocality() != null) {
-                                placeName = address.getLocality(); // most common
-                            } else if (address.getSubAdminArea() != null) {
-                                placeName = address.getSubAdminArea(); // fallback
-                            } else if (address.getAdminArea() != null) {
-                                placeName = address.getAdminArea(); // broader fallback
-                            }
-
-                            Intent intent = new Intent(MapActivity.this, AddTripDetailsActivity.class);
-                            intent.putExtra("lat", location.latitude);
-                            intent.putExtra("lng", location.longitude);
-                            intent.putExtra("suggestedName", placeName);
-                            System.out.println("MapActivity:\nLat: "+ location.latitude + "\tLng: " + location.longitude);
-                            tripDetailsLauncher.launch(intent);
+                        if (address.getLocality() != null) {
+                            placeName = address.getLocality();
+                        } else if (address.getSubAdminArea() != null) {
+                            placeName = address.getSubAdminArea();
+                        } else if (address.getAdminArea() != null) {
+                            placeName = address.getAdminArea();
                         }
 
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        Intent intent = new Intent(MapActivity.this, AddTripDetailsActivity.class);
+                        intent.putExtra("lat", location.latitude);
+                        intent.putExtra("lng", location.longitude);
+                        intent.putExtra("suggestedName", placeName);
+                        tripDetailsLauncher.launch(intent);
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             });
             dialogFragment.show(getSupportFragmentManager(), "VisitedDialog");
@@ -207,14 +198,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-//        assert data != null;
-        double lat = data.getDoubleExtra("lat",0);
-            double lng = data.getDoubleExtra("lng",0);
+        if (data != null) {
+            double lat = data.getDoubleExtra("lat", 0);
+            double lng = data.getDoubleExtra("lng", 0);
             String title = data.getStringExtra("title");
 
             LatLng location = new LatLng(lat, lng);
             mMaps.addMarker(new MarkerOptions().position(location).title(title));
             mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
+        }
     }
 }
