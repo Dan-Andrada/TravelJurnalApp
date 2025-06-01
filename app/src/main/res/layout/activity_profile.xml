@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Account Information"
-        android:textSize="26sp"
+        android:textSize="24sp"
         android:textStyle="italic|bold"
         android:textColor="#4B2E2E"
         android:layout_marginBottom="24dp" />
@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:text="First Name"
         android:textSize="14sp"
-        android:textColor="#999999" />
+        android:textColor="#A09393" />
 
     <TextView
         android:id="@+id/firstnameTextView"
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:textStyle="italic"
-        android:textColor="#333333"
+        android:textColor="#3E3E3E"
         android:layout_marginBottom="16dp" />
 
     <TextView
@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:text="Last Name"
         android:textSize="14sp"
-        android:textColor="#999999" />
+        android:textColor="#A09393" />
 
     <TextView
         android:id="@+id/lastnameTextView"
@@ -44,7 +44,7 @@
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:textStyle="italic"
-        android:textColor="#333333"
+        android:textColor="#3E3E3E"
         android:layout_marginBottom="16dp" />
 
     <TextView
@@ -52,24 +52,29 @@
         android:layout_height="wrap_content"
         android:text="Email"
         android:textSize="14sp"
-        android:textColor="#999999" />
+        android:textColor="#A09393" />
 
     <TextView
         android:id="@+id/emailTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        android:textColor="#333333"
+        android:textStyle="italic"
+        android:textColor="#3E3E3E"
         android:layout_marginBottom="32dp" />
 
     <Button
         android:id="@+id/logoutButton"
-        android:layout_width="151dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@drawable/rounded_button"
-        android:padding="12dp"
+        android:backgroundTint="#E3C9B1"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
         android:text="Logout"
-        android:textColor="#FFFFFF" />
+        android:textColor="#4B2E2E"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>

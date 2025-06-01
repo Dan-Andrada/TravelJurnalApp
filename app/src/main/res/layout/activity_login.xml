@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="#d9b49c"
+    android:background="#F6E9DC"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:text="Travel\nJurnal"
             android:textSize="32sp"
-            android:textColor="#000"
+            android:textColor="#4B2E2E"
             android:textStyle="bold"
             android:gravity="center"
             android:fontFamily="cursive"
@@ -29,28 +29,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Email"
-            android:backgroundTint="#fce3d1"
             android:background="@drawable/rounded_edittext"
             android:padding="12dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:textColor="#4B2E2E"
+            android:textColorHint="#9A7B6F"
+            android:inputType="textEmailAddress" />
 
         <EditText
             android:id="@+id/editTextPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Password"
-            android:backgroundTint="#fce3d1"
             android:background="@drawable/rounded_edittext"
             android:padding="12dp"
             android:layout_marginBottom="8dp"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:textColor="#4B2E2E"
+            android:textColorHint="#9A7B6F" />
 
         <TextView
             android:id="@+id/textForgotPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Forgot password?"
-            android:textColor="#000"
+            android:textColor="#8E5D52"
             android:textStyle="bold"
             android:layout_gravity="end"
             android:layout_marginBottom="24dp" />
@@ -60,19 +63,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="LOG IN"
-            android:backgroundTint="#4b2e1e"
-            android:textColor="@android:color/white"
+            android:textColor="#4B2E2E"
+            android:textStyle="bold"
+            android:backgroundTint="#E3C9B1"
             android:layout_marginBottom="16dp"
-            android:background="@drawable/rounded_button" />
+            android:background="@drawable/rounded_button"
+            android:paddingVertical="12dp" />
 
         <TextView
             android:id="@+id/textSignUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="You don't have an account? Sign up now"
-            android:textColor="#000"
+            android:textColor="#4B2E2E"
             android:textStyle="bold"
-            android:gravity="center"/>
-
+            android:gravity="center" />
     </LinearLayout>
 </LinearLayout>

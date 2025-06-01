@@ -182,9 +182,9 @@
                     android:layout_width="121dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="226dp"
-                    android:background="@drawable/searchbar_bg"
                     android:text="@string/done"
-                    android:textColor="#000000"
+                    android:textColor="#4B2E2E"
+                    android:backgroundTint="#E3C9B1"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

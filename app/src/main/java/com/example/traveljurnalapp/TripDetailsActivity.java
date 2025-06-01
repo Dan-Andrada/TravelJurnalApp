@@ -2,13 +2,19 @@ package com.example.traveljurnalapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
-import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.traveljurnalapp.NotesActivity;
+import com.example.traveljurnalapp.NotesStorage;
+import com.example.traveljurnalapp.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,16 +28,7 @@ public class TripDetailsActivity extends AppCompatActivity {
     private ImageButton addPhotoButton;
     private Date startDate, endDate;
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        String tripId = "antalya_2025";
-        String fullNote = NotesStorage.getNote(tripId);
-
-        String preview = fullNote.split("\n", 2)[0];
-        notePreview.setText(preview);
-    }
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,56 +44,78 @@ public class TripDetailsActivity extends AppCompatActivity {
         newAlbumButton = findViewById(R.id.newAlbumButton);
         addPhotoButton = findViewById(R.id.addPhotoButton);
 
-        //harcodat
-        String tripId = "antalya_2025";
-        tripTitle.setText("Your trip to Antalya:");
-        categoryText.setText("• Category: City");
-        moneySpent.setText("• Money spent: 1000 $");
+        db = FirebaseFirestore.getInstance();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH);
+        String tripId = getIntent().getStringExtra("tripId");
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        if (tripId != null && userId != null) {
+            db.collection("users")
+                    .document(userId)
+                    .collection("trips")
+                    .document(tripId)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            updateUIWithTrip(documentSnapshot, tripId);
+                        } else {
+                            Toast.makeText(this, "Trip not found", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Failed to load trip: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
+
+    private void updateUIWithTrip(DocumentSnapshot doc, String tripId) {
+        String placeName = doc.getString("placeName");
+        String type = doc.getString("type");
+        String start = doc.getString("startDate");
+        String end = doc.getString("endDate");
+        String note = doc.getString("note");
+        Long spending = doc.getLong("spending");
+
+        tripTitle.setText("Your trip to " + placeName + ":");
+        categoryText.setText("• Category: " + type);
+        moneySpent.setText("• Money spent: " + (spending != null ? spending : 0) + " $");
+
+        SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        SimpleDateFormat displayFormat = new SimpleDateFormat("dd MMM", Locale.ENGLISH);
         try {
-            startDate = sdf.parse("10 March 2025");
-            endDate = sdf.parse("16 March 2025");
+            startDate = dbFormat.parse(start);
+            endDate = dbFormat.parse(end);
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
         if (startDate != null && endDate != null) {
-            SimpleDateFormat displayFormat = new SimpleDateFormat("dd MMM", Locale.ENGLISH);
             String dateText = displayFormat.format(startDate) + " - " + displayFormat.format(endDate) + " 2025";
             tripDates.setText(dateText);
         }
 
-        //harcodat
         String fullNote = NotesStorage.getNote(tripId);
         String preview = fullNote.split("\n", 2)[0];
-
         notePreview.setText("• " + preview);
 
-        viewNoteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(TripDetailsActivity.this, NotesActivity.class);
-                intent.putExtra("tripId", "antalya_2025");
-                //intent.putExtra("tripId", fullNote);
-                startActivity(intent);
-            }
+        viewNoteButton.setOnClickListener(v -> {
+            Intent intent = new Intent(TripDetailsActivity.this, NotesActivity.class);
+            intent.putExtra("tripId", tripId);
+            startActivity(intent);
         });
 
-        newAlbumButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // deschide pagina pentru creare album - de implementat
-            }
+        newAlbumButton.setOnClickListener(v -> {
+            // TODO: implement album creation
         });
 
-        addPhotoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // deschide selectorul de poze - de implementat
-            }
+        addPhotoButton.setOnClickListener(v -> {
+            // TODO: implement photo selector
         });
+    }
 
-        GridLayout photosGrid = findViewById(R.id.photosGrid);
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 }
