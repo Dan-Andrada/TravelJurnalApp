@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFDF9">
+
+    <LinearLayout
+        android:id="@+id/tripListLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🧳 Trip History:"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:fontFamily="cursive"
+            android:textColor="#4B2E2E"
+            android:layout_marginBottom="16dp" />
+
+        <EditText
+            android:id="@+id/searchEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Search your trip..."
+            android:padding="12dp"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="#4B2E2E"
+            android:textColorHint="#9A7B6F"
+            android:drawableEnd="@android:drawable/ic_menu_search"
+            android:layout_marginBottom="16dp" />
+    </LinearLayout>
+</ScrollView>
