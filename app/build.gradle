@@ -42,10 +42,13 @@ dependencies {
     implementation libs.play.services.maps
     implementation libs.places
     implementation libs.material.v1110
+    implementation libs.firebase.storage
 
 
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit.v115
     androidTestImplementation libs.androidx.espresso.core.v351
+    implementation "androidx.activity:activity:1.7.2"
+
 }
 
