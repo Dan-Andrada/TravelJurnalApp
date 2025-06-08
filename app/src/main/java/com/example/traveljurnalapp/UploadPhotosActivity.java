@@ -12,6 +12,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -33,6 +34,8 @@ public class UploadPhotosActivity extends AppCompatActivity {
     private PhotoAdapter adapter;
     private Button addPhotosButton;
     private Button doneButton;
+    private int favoritePosition = -1;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,7 +49,33 @@ public class UploadPhotosActivity extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
-        adapter = new PhotoAdapter(this, imageUris);
+        adapter = new PhotoAdapter(this, imageUris, new PhotoActionListener() {
+            @Override
+            public void onRemovePhoto(int position) {
+                imageUris.remove(position);
+                if (position == favoritePosition) favoritePosition = -1;
+                adapter.notifyItemRemoved(position);
+            }
+
+            @Override
+            public void onFavoritePhoto(int position) {
+                if (favoritePosition == -1) {
+                    favoritePosition = position;
+                    adapter.setFavoritePosition(position);
+                } else if (favoritePosition != position) {
+                    // Show confirmation dialog
+                    new AlertDialog.Builder(UploadPhotosActivity.this)
+                            .setTitle("Change Favorite")
+                            .setMessage("You're about to change your favorite photo. Continue?")
+                            .setPositiveButton("Yes", (dialog, which) -> {
+                                favoritePosition = position;
+                                adapter.setFavoritePosition(position);
+                            })
+                            .setNegativeButton("No", null)
+                            .show();
+                }
+            }
+        });
         recyclerView.setAdapter(adapter);
 
         addPhotosButton = findViewById(R.id.addPhotosButton);

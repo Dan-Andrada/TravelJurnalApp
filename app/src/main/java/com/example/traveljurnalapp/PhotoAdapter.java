@@ -17,16 +17,19 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
 
     private final Context context;
     private final List<Uri> images;
+    private final PhotoActionListener listener;
+    private int favoritePosition = -1;
 
-    public PhotoAdapter(Context context, List<Uri> images) {
+    public PhotoAdapter(Context context, List<Uri> images, PhotoActionListener listener) {
         this.context = context;
         this.images = images;
+        this.listener = listener;
     }
 
     @NonNull
     @Override
     public PhotoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_photo, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.icons_photo, parent, false);
         return new PhotoViewHolder(view);
     }
 
@@ -34,6 +37,13 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
     public void onBindViewHolder(@NonNull PhotoViewHolder holder, int position) {
         Uri imageUri = images.get(position);
         Glide.with(context).load(imageUri).into(holder.imageView);
+
+        // Favorite overlay visibility
+        holder.favoriteIcon.setVisibility(position == favoritePosition ? View.VISIBLE : View.GONE);
+
+        holder.removeButton.setOnClickListener(v -> listener.onRemovePhoto(position));
+
+        holder.imageView.setOnClickListener(v -> listener.onFavoritePhoto(position));
     }
 
     @Override
@@ -42,11 +52,27 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
     }
 
     public static class PhotoViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView;
+        ImageView imageView, removeButton, favoriteIcon;
+
         public PhotoViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
+            removeButton = itemView.findViewById(R.id.removeIcon);
+            favoriteIcon = itemView.findViewById(R.id.favoriteIcon);
         }
     }
 
+    public void setFavoritePosition(int position) {
+        int oldFavorite = favoritePosition;
+        favoritePosition = position;
+        notifyItemChanged(oldFavorite);
+        notifyItemChanged(favoritePosition);
+    }
+
 }
+
+interface PhotoActionListener {
+    void onRemovePhoto(int position);
+    void onFavoritePhoto(int position);
+}
+
