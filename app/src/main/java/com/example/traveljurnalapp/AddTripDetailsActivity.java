@@ -52,6 +52,8 @@ public class AddTripDetailsActivity extends AppCompatActivity {
     private String temporaryNote = "";
     private static final int REQUEST_CODE_UPLOAD_PHOTOS = 1001;
     private ArrayList<Uri> selectedImages = new ArrayList<>();
+    private int favoriteIndex = -1;
+
 
 
 
@@ -134,6 +136,7 @@ public class AddTripDetailsActivity extends AppCompatActivity {
         uploadPhotoButton.setOnClickListener(view -> {
             Intent intent = new Intent(AddTripDetailsActivity.this, UploadPhotosActivity.class);
             intent.putParcelableArrayListExtra("selectedImages", selectedImages);
+            intent.putExtra("favoriteIndex", favoriteIndex);
             startActivityForResult(intent, REQUEST_CODE_UPLOAD_PHOTOS);
 
         });
@@ -196,11 +199,13 @@ public class AddTripDetailsActivity extends AppCompatActivity {
                                 StorageReference imageRef = FirebaseStorage.getInstance()
                                         .getReference("users/" + user.getUid() + "/trips/" + tripId + "/photo_" + i + ".jpg");
 
+                                final int currentIndex = i;
                                 imageRef.putFile(tempUri)
                                         .addOnSuccessListener(taskSnapshot ->
                                                 imageRef.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
                                                     Map<String, Object> photoData = new HashMap<>();
                                                     photoData.put("url", downloadUrl.toString());
+                                                    photoData.put("isFavorite", currentIndex == favoriteIndex);
 
                                                     db.collection("users")
                                                             .document(user.getUid())
@@ -257,6 +262,7 @@ public class AddTripDetailsActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_UPLOAD_PHOTOS && resultCode == RESULT_OK && data != null) {
             selectedImages = data.getParcelableArrayListExtra("selectedImages");
+            favoriteIndex = data.getIntExtra("favoriteIndex", -1);
             Toast.makeText(this, selectedImages.size() + " photos selected", Toast.LENGTH_SHORT).show();
         }
     }

@@ -34,7 +34,7 @@ public class UploadPhotosActivity extends AppCompatActivity {
     private PhotoAdapter adapter;
     private Button addPhotosButton;
     private Button doneButton;
-    private int favoritePosition = -1;
+    private int favoritePosition;
 
 
     @Override
@@ -46,6 +46,7 @@ public class UploadPhotosActivity extends AppCompatActivity {
         if (incomingUris != null && !incomingUris.isEmpty()) {
             imageUris.addAll(incomingUris);
         }
+        favoritePosition = getIntent().getIntExtra("favoriteIndex", -1);
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
@@ -90,6 +91,7 @@ public class UploadPhotosActivity extends AppCompatActivity {
             }
             Intent resultIntent = new Intent();
             resultIntent.putParcelableArrayListExtra("selectedImages", new ArrayList<>(imageUris));
+            resultIntent.putExtra("favoriteIndex", favoritePosition);
             setResult(RESULT_OK, resultIntent);
             finish();
         });
