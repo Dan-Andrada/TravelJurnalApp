@@ -85,7 +85,8 @@ public class TripDetailsActivity extends AppCompatActivity {
         SimpleDateFormat displayFormat = new SimpleDateFormat("dd MMM", Locale.ENGLISH);
         try {
             startDate = dbFormat.parse(start);
-            endDate = dbFormat.parse(end);
+            if(endDate != null)
+                endDate = dbFormat.parse(end);
         } catch (ParseException e) {
             e.printStackTrace();
         }

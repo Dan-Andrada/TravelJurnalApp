@@ -4,7 +4,13 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -21,11 +27,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.AutocompletePrediction;
@@ -153,12 +165,40 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         Double lngObj = doc.getDouble("lng");
                         String placeName = doc.getString("placeName");
 
+//                        if (latObj != null && lngObj != null && placeName != null) {
+//                            LatLng tripLocation = new LatLng(latObj, lngObj);
+//                            mMaps.addMarker(new MarkerOptions().position(tripLocation).title(placeName));
+//                        } else {
+//                            System.out.println("Ignored: " + doc.getId());
+//                        }
+
                         if (latObj != null && lngObj != null && placeName != null) {
                             LatLng tripLocation = new LatLng(latObj, lngObj);
-                            mMaps.addMarker(new MarkerOptions().position(tripLocation).title(placeName));
-                        } else {
-                            System.out.println("Ignored: " + doc.getId());
+                            String tripId = doc.getId();
+
+                            // 🔍 Find favorite photo
+                            db.collection("users")
+                                    .document(user.getUid())
+                                    .collection("trips")
+                                    .document(tripId)
+                                    .collection("photos")
+                                    .whereEqualTo("isFavorite", true)
+                                    .get()
+                                    .addOnSuccessListener(photoSnaps -> {
+                                        if (!photoSnaps.isEmpty()) {
+                                            String imageUrl = photoSnaps.getDocuments().get(0).getString("url");
+                                            createCustomMarkerFromUrl(this, mMaps, imageUrl, tripLocation,tripId);
+                                        } else {
+                                            // Fallback if no favorite image
+                                            Marker marker = mMaps.addMarker(new MarkerOptions().position(tripLocation).title(placeName));
+                                            marker.setTag(tripId);
+                                        }
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(this, "Error loading photo for: " + placeName, Toast.LENGTH_SHORT).show();
+                                    });
                         }
+
                     }
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load saved trips", Toast.LENGTH_SHORT).show());
@@ -193,6 +233,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             });
             dialogFragment.show(getSupportFragmentManager(), "VisitedDialog");
         });
+
+        mMaps.setOnMarkerClickListener(marker -> {
+            String tripId = (String) marker.getTag();
+            if (tripId != null) {
+                Intent intent = new Intent(MapActivity.this, TripDetailsActivity.class);
+                intent.putExtra("tripId", tripId);
+                startActivity(intent);
+            }
+            return true; // consume the click
+        });
+
     }
 
     @Override
@@ -208,4 +259,48 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
         }
     }
+
+    private void createCustomMarkerFromUrl(Context context, GoogleMap map, String imageUrl, LatLng latLng, String tripId) {
+        Glide.with(context)
+                .asBitmap()
+                .load(imageUrl)
+                .override(180, 120) // Width x Height in pixels — you can tweak these values
+                .centerCrop()
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        Bitmap withBorder = addWhiteBorder(resource, 8);
+                        BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(withBorder);
+
+                        Marker marker = map.addMarker(new MarkerOptions().position(latLng).icon(icon));
+                        marker.setTag(tripId); // Store trip ID for later
+
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+                        // No need to handle this for markers
+                    }
+                });
+    }
+
+    private Bitmap addWhiteBorder(Bitmap original, int borderSize) {
+        int width = original.getWidth();
+        int height = original.getHeight();
+        Bitmap bordered = Bitmap.createBitmap(width + borderSize * 2, height + borderSize * 2, original.getConfig());
+        Canvas canvas = new Canvas(bordered);
+
+        // Draw white rectangle
+        Paint paint = new Paint();
+        paint.setColor(Color.WHITE);
+        paint.setStyle(Paint.Style.FILL);
+        canvas.drawRect(0, 0, bordered.getWidth(), bordered.getHeight(), paint);
+
+        // Draw the original image on top
+        canvas.drawBitmap(original, borderSize, borderSize, null);
+
+        return bordered;
+    }
+
+
 }
