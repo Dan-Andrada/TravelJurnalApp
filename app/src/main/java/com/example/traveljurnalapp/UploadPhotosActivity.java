@@ -60,21 +60,7 @@ public class UploadPhotosActivity extends AppCompatActivity {
 
             @Override
             public void onFavoritePhoto(int position) {
-                if (favoritePosition == -1) {
-                    favoritePosition = position;
-                    adapter.setFavoritePosition(position);
-                } else if (favoritePosition != position) {
-                    // Show confirmation dialog
-                    new AlertDialog.Builder(UploadPhotosActivity.this)
-                            .setTitle("Change Favorite")
-                            .setMessage("You're about to change your favorite photo. Continue?")
-                            .setPositiveButton("Yes", (dialog, which) -> {
-                                favoritePosition = position;
-                                adapter.setFavoritePosition(position);
-                            })
-                            .setNegativeButton("No", null)
-                            .show();
-                }
+                adapter.promptFavoriteChange(position);
             }
         });
         recyclerView.setAdapter(adapter);
@@ -95,6 +81,7 @@ public class UploadPhotosActivity extends AppCompatActivity {
             setResult(RESULT_OK, resultIntent);
             finish();
         });
+
     }
 
     private void checkPermissionAndPickImages() {
