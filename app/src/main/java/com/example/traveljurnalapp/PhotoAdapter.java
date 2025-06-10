@@ -48,9 +48,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
             holder.favoriteIcon.setImageResource(R.drawable.heart_icon);
         }
 
-        // Favorite overlay visibility
-//        holder.favoriteIcon.setVisibility(position == favoritePosition ? View.VISIBLE : View.GONE);
-
         holder.favoriteIcon.setOnClickListener(v -> {
             int pos = holder.getAdapterPosition();
             if (pos == RecyclerView.NO_POSITION) return;

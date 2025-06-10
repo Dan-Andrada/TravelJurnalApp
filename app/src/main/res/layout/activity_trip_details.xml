@@ -114,26 +114,25 @@
                 android:background="@null"
                 android:contentDescription="Add photo" />
 
-            <Button
-                android:id="@+id/newAlbumButton"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="New Album"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Add more photos"
                 android:textColor="#4B2E2E"
-                android:backgroundTint="#E3C9B1"
-                android:layout_marginStart="16dp"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp" />
+                android:textSize="18sp"
+                android:layout_marginTop="7dp"/>
+
         </LinearLayout>
 
-        <GridLayout
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/photosGrid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnCount="3"
-            android:orientation="horizontal"
-            android:alignmentMode="alignMargins"
-            android:rowOrderPreserved="false"
-            android:useDefaultMargins="true" />
+            android:layout_margin="8dp"
+            android:padding="4dp"
+            android:clipToPadding="false"
+            android:scrollbars="none"/>
     </LinearLayout>
 </ScrollView>
