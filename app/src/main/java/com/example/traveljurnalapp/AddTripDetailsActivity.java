@@ -53,6 +53,7 @@ public class AddTripDetailsActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_UPLOAD_PHOTOS = 1001;
     private ArrayList<Uri> selectedImages = new ArrayList<>();
     private int favoriteIndex = -1;
+    private String favoriteImageUrl;
 
 
 
@@ -141,6 +142,7 @@ public class AddTripDetailsActivity extends AppCompatActivity {
 
         });
 
+
         notesButton.setOnClickListener(view -> {
             Intent intent = new Intent(AddTripDetailsActivity.this, NotesActivity.class);
             intent.putExtra("tempNote", temporaryNote);
@@ -203,8 +205,9 @@ public class AddTripDetailsActivity extends AppCompatActivity {
                                 imageRef.putFile(tempUri)
                                         .addOnSuccessListener(taskSnapshot ->
                                                 imageRef.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
+                                                    favoriteImageUrl = downloadUrl.toString();
                                                     Map<String, Object> photoData = new HashMap<>();
-                                                    photoData.put("url", downloadUrl.toString());
+                                                    photoData.put("url", favoriteImageUrl);
                                                     photoData.put("isFavorite", currentIndex == favoriteIndex);
 
                                                     db.collection("users")
@@ -230,6 +233,8 @@ public class AddTripDetailsActivity extends AppCompatActivity {
                         intent.putExtra("lat", lat);
                         intent.putExtra("lng", lng);
                         intent.putExtra("title", placeName);
+                        intent.putExtra("coverUrl", favoriteImageUrl);
+                        intent.putExtra("tripId",tripId);
                         setResult(RESULT_OK, intent);
                         finish();
                     })

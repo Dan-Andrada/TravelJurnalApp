@@ -19,28 +19,39 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UploadPhotosActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE = 1;
     private List<Uri> imageUris = new ArrayList<>();
     private PhotoAdapter adapter;
-    private Button addPhotosButton;
+    private FloatingActionButton addPhotosButton;
     private Button doneButton;
     private int favoritePosition;
+    private String tripId;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_photos);
+        tripId = getIntent().getStringExtra("tripId");
 
         ArrayList<Uri> incomingUris = getIntent().getParcelableArrayListExtra("selectedImages");
         if (incomingUris != null && !incomingUris.isEmpty()) {
@@ -48,7 +59,7 @@ public class UploadPhotosActivity extends AppCompatActivity {
         }
         favoritePosition = getIntent().getIntExtra("favoriteIndex", -1);
 
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = findViewById(R.id.photoRecyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         adapter = new PhotoAdapter(this, imageUris, new PhotoActionListener() {
             @Override
@@ -58,9 +69,11 @@ public class UploadPhotosActivity extends AppCompatActivity {
                 adapter.notifyItemRemoved(position);
             }
 
+
             @Override
             public void onFavoritePhoto(int position) {
                 adapter.promptFavoriteChange(position);
+                favoritePosition = position;
             }
         });
         recyclerView.setAdapter(adapter);
@@ -75,13 +88,92 @@ public class UploadPhotosActivity extends AppCompatActivity {
                 Toast.makeText(this, "No photos selected", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Intent resultIntent = new Intent();
-            resultIntent.putParcelableArrayListExtra("selectedImages", new ArrayList<>(imageUris));
-            resultIntent.putExtra("favoriteIndex", favoritePosition);
-            setResult(RESULT_OK, resultIntent);
-            finish();
+            if (tripId != null) {
+                uploadPhotosToFirebase();
+            } else {
+                Intent resultIntent = new Intent();
+                resultIntent.putParcelableArrayListExtra("selectedImages", new ArrayList<>(imageUris));
+                resultIntent.putExtra("favoriteIndex", favoritePosition);
+                setResult(RESULT_OK, resultIntent);
+                finish();
+            }
         });
 
+    }
+
+    private void uploadPhotosToFirebase(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            return;
+        }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+
+        db.collection("users")
+                .document(user.getUid())
+                .collection("trips")
+                .document(tripId)
+                .collection("photos")
+                .whereEqualTo("isFavorite", true)
+                .get()
+                .addOnSuccessListener(existingFavorites -> {
+
+                    boolean alreadyHasFavorite = !existingFavorites.isEmpty();
+
+                    Runnable uploadTask = () -> {
+                        for (int i = 0; i < imageUris.size(); i++) {
+                            Uri imageUri = imageUris.get(i);
+
+                            try {
+                                File copiedFile = copyUriToFile(this, imageUri);
+                                Uri tempUri = Uri.fromFile(copiedFile);
+
+                                StorageReference ref = storage.getReference("users/" + user.getUid() + "/trips/" + tripId + "/photo_" + System.currentTimeMillis() + ".jpg");
+
+                                int finalI = i;
+                                ref.putFile(tempUri)
+                                        .addOnSuccessListener(taskSnapshot ->
+                                                ref.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
+                                                    Map<String, Object> photoData = new HashMap<>();
+                                                    photoData.put("url", downloadUrl.toString());
+                                                    photoData.put("isFavorite", finalI == favoritePosition && !alreadyHasFavorite);
+
+                                                    db.collection("users")
+                                                            .document(user.getUid())
+                                                            .collection("trips")
+                                                            .document(tripId)
+                                                            .collection("photos")
+                                                            .add(photoData);
+                                                }))
+                                        .addOnFailureListener(e ->
+                                                Toast.makeText(this, "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                Toast.makeText(this, "Failed to copy image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        Toast.makeText(this, "Photos uploaded", Toast.LENGTH_SHORT).show();
+                        finish();
+                    };
+
+                    if (alreadyHasFavorite && favoritePosition != -1) {
+                        new CustomActionDialogFragment(
+                                "This trip already has a favorite photo. Do you want to replace it with the new one?",
+                                () -> uploadTask.run(),
+                                () -> {
+                                    favoritePosition = -1;
+                                    uploadTask.run();
+                                }
+                        ).show(this.getSupportFragmentManager(), "ReplaceDialog");
+
+                    } else {
+                        uploadTask.run();
+                    }
+
+                });
     }
 
     private void checkPermissionAndPickImages() {

@@ -10,6 +10,7 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -48,25 +49,17 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
             holder.favoriteIcon.setImageResource(R.drawable.heart_icon);
         }
 
-        // Favorite overlay visibility
-//        holder.favoriteIcon.setVisibility(position == favoritePosition ? View.VISIBLE : View.GONE);
-
         holder.favoriteIcon.setOnClickListener(v -> {
             int pos = holder.getAdapterPosition();
             if (pos == RecyclerView.NO_POSITION) return;
 
             if (pos == favoritePosition) return;
 
-            new AlertDialog.Builder(context)
-                    .setTitle("You chose this photo as the pin cover.")
-                    .setMessage("Would you like to continue?")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        favoritePosition = pos;
-                        notifyDataSetChanged();
-                        if (listener != null) listener.onFavoritePhoto(pos);
-                    })
-                    .setNegativeButton("No", null)
-                    .show();
+            new CustomActionDialogFragment("You chose this photo as the pin cover. Would you like to continue?",() -> {
+                favoritePosition = pos;
+                notifyDataSetChanged();
+                if (listener != null) listener.onFavoritePhoto(pos);
+            },()->{}).show(((AppCompatActivity) context).getSupportFragmentManager(), "ConfirmDialog");
         });
 
 
@@ -88,12 +81,10 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
     public void promptFavoriteChange(int position) {
         if (position == favoritePosition) return;
 
-        new AlertDialog.Builder(context)
-                .setTitle("You chose this photo as the pin cover.")
-                .setMessage("Would you like to continue?")
-                .setPositiveButton("Yes", (dialog, which) -> setFavoritePosition(position))
-                .setNegativeButton("No", null)
-                .show();
+        new CustomActionDialogFragment("You chose this photo as the pin cover. Would you like to continue?",() -> {
+            setFavoritePosition(position);
+        },()->{}).show(((AppCompatActivity) context).getSupportFragmentManager(), "ConfirmDialog");
+
     }
 
 
@@ -121,6 +112,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
     }
 
 }
+
 
 interface PhotoActionListener {
 

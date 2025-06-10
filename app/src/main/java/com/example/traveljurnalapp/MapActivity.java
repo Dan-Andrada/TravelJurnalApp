@@ -28,6 +28,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -165,13 +166,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         Double lngObj = doc.getDouble("lng");
                         String placeName = doc.getString("placeName");
 
-//                        if (latObj != null && lngObj != null && placeName != null) {
-//                            LatLng tripLocation = new LatLng(latObj, lngObj);
-//                            mMaps.addMarker(new MarkerOptions().position(tripLocation).title(placeName));
-//                        } else {
-//                            System.out.println("Ignored: " + doc.getId());
-//                        }
-
                         if (latObj != null && lngObj != null && placeName != null) {
                             LatLng tripLocation = new LatLng(latObj, lngObj);
                             String tripId = doc.getId();
@@ -241,7 +235,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 intent.putExtra("tripId", tripId);
                 startActivity(intent);
             }
-            return true; // consume the click
+            return true;
         });
 
     }
@@ -253,54 +247,140 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             double lat = data.getDoubleExtra("lat", 0);
             double lng = data.getDoubleExtra("lng", 0);
             String title = data.getStringExtra("title");
+            String coverUrl = data.getStringExtra("coverUrl");
+            String tripId = data.getStringExtra("tripId");
 
             LatLng location = new LatLng(lat, lng);
-            mMaps.addMarker(new MarkerOptions().position(location).title(title));
-            mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
+
+            if (coverUrl != null && !coverUrl.isEmpty()) {
+                Glide.with(this)
+                        .asBitmap()
+                        .load(coverUrl)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .skipMemoryCache(true)
+                        .override(180, 120)
+                        .centerCrop()
+                        .into(new CustomTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                Bitmap withBorder = addBlackBorder(resource, 8);
+                                BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(withBorder);
+
+                                Marker marker = mMaps.addMarker(new MarkerOptions().position(location).icon(icon));
+                                marker.setTag(tripId);
+                                mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
+                            }
+
+                            @Override
+                            public void onLoadCleared(@Nullable Drawable placeholder) { }
+                        });
+
+            } else {
+                mMaps.addMarker(new MarkerOptions().position(location).title(title));
+                mMaps.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
+            }
+
+            mMaps.setOnMarkerClickListener(marker -> {
+                if (tripId != null) {
+                    Intent intent = new Intent(MapActivity.this, TripDetailsActivity.class);
+                    intent.putExtra("tripId", tripId);
+                    startActivity(intent);
+                }
+                return true;
+            });
+
+
         }
     }
+
 
     private void createCustomMarkerFromUrl(Context context, GoogleMap map, String imageUrl, LatLng latLng, String tripId) {
         Glide.with(context)
                 .asBitmap()
                 .load(imageUrl)
-                .override(180, 120) // Width x Height in pixels — you can tweak these values
+                .override(180, 120)
                 .centerCrop()
                 .into(new CustomTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        Bitmap withBorder = addWhiteBorder(resource, 8);
+                        Bitmap withBorder = addBlackBorder(resource, 8);
                         BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(withBorder);
 
                         Marker marker = map.addMarker(new MarkerOptions().position(latLng).icon(icon));
-                        marker.setTag(tripId); // Store trip ID for later
+                        marker.setTag(tripId);
 
                     }
 
                     @Override
                     public void onLoadCleared(@Nullable Drawable placeholder) {
-                        // No need to handle this for markers
                     }
                 });
     }
 
-    private Bitmap addWhiteBorder(Bitmap original, int borderSize) {
+    private Bitmap addBlackBorder(Bitmap original, int borderSize) {
         int width = original.getWidth();
         int height = original.getHeight();
         Bitmap bordered = Bitmap.createBitmap(width + borderSize * 2, height + borderSize * 2, original.getConfig());
         Canvas canvas = new Canvas(bordered);
 
-        // Draw white rectangle
         Paint paint = new Paint();
-        paint.setColor(Color.WHITE);
+        paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.FILL);
         canvas.drawRect(0, 0, bordered.getWidth(), bordered.getHeight(), paint);
 
-        // Draw the original image on top
         canvas.drawBitmap(original, borderSize, borderSize, null);
 
         return bordered;
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mMaps != null) {
+            mMaps.clear(); // Clear old markers
+            loadTripMarkers(); // Reload all markers including updated favorite photos
+        }
+    }
+
+
+    private void loadTripMarkers() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("users")
+                .document(user.getUid())
+                .collection("trips")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        Double latObj = doc.getDouble("lat");
+                        Double lngObj = doc.getDouble("lng");
+                        String placeName = doc.getString("placeName");
+
+                        if (latObj != null && lngObj != null && placeName != null) {
+                            LatLng tripLocation = new LatLng(latObj, lngObj);
+                            String tripId = doc.getId();
+
+                            // Load favorite image
+                            db.collection("users")
+                                    .document(user.getUid())
+                                    .collection("trips")
+                                    .document(tripId)
+                                    .collection("photos")
+                                    .whereEqualTo("isFavorite", true)
+                                    .get()
+                                    .addOnSuccessListener(photoSnaps -> {
+                                        if (!photoSnaps.isEmpty()) {
+                                            String imageUrl = photoSnaps.getDocuments().get(0).getString("url");
+                                            createCustomMarkerFromUrl(this, mMaps, imageUrl, tripLocation, tripId);
+                                        } else {
+                                            Marker marker = mMaps.addMarker(new MarkerOptions().position(tripLocation).title(placeName));
+                                            marker.setTag(tripId);
+                                        }
+                                    });
+                        }
+                    }
+                });
+    }
 
 }
