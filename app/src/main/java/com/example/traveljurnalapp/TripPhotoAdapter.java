@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -48,28 +48,21 @@ public class TripPhotoAdapter extends RecyclerView.Adapter<TripPhotoAdapter.Phot
         holder.favoriteIcon.setOnClickListener(v -> {
             if (photo.isFavorite()) return;
 
-            new AlertDialog.Builder(context)
-                    .setTitle("Change favorite?")
-                    .setMessage("You chose this photo as PIN COVER. Would you like to continue?")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        for (Photo p : photos) p.setFavorite(false);
-                        photo.setFavorite(true);
-                        notifyDataSetChanged();
-                        updateFavoriteInFirebase(photo);
-                    })
-                    .setNegativeButton("No", null)
-                    .show();
+            new CustomActionDialogFragment("You chose this photo as the pin cover. Would you like to continue?",() -> {
+                for (Photo p : photos) p.setFavorite(false);
+                photo.setFavorite(true);
+                notifyDataSetChanged();
+                updateFavoriteInFirebase(photo);
+            },()->{}).show(((AppCompatActivity) context).getSupportFragmentManager(), "ConfirmDialog");
+
         });
 
         holder.removeIcon.setOnClickListener(v -> {
-            new AlertDialog.Builder(context)
-                    .setTitle("Delete photo?")
-                    .setMessage("Are you sure you want to delete this photo?")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        deletePhotoFromFirebase(photo, position);
-                    })
-                    .setNegativeButton("No", null)
-                    .show();
+
+            new CustomActionDialogFragment("You chose this photo as the pin cover. Would you like to continue?",() -> {
+                deletePhotoFromFirebase(photo, position);
+            },()->{}).show(((AppCompatActivity) context).getSupportFragmentManager(), "ConfirmDialog");
+
         });
 
         holder.imageView.setOnClickListener(v -> {

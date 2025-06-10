@@ -160,17 +160,15 @@ public class UploadPhotosActivity extends AppCompatActivity {
                     };
 
                     if (alreadyHasFavorite && favoritePosition != -1) {
-                        new AlertDialog.Builder(this)
-                                .setTitle("Favorite already exists")
-                                .setMessage("This trip already has a favorite photo. Do you want to replace it with the new one?")
-                                .setPositiveButton("Yes", (dialog, which) -> {
+                        new CustomActionDialogFragment(
+                                "This trip already has a favorite photo. Do you want to replace it with the new one?",
+                                () -> uploadTask.run(),
+                                () -> {
+                                    favoritePosition = -1;
                                     uploadTask.run();
-                                })
-                                .setNegativeButton("No", (dialog, which) -> {
-                                    favoritePosition = -1; // cancel favorite
-                                    uploadTask.run();
-                                })
-                                .show();
+                                }
+                        ).show(this.getSupportFragmentManager(), "ReplaceDialog");
+
                     } else {
                         uploadTask.run();
                     }

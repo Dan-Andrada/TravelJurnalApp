@@ -6,19 +6,18 @@
     android:layout_height="match_parent"
     android:background="#FFFDF8">
 
-    <!-- Title -->
     <TextView
         android:id="@+id/titleUpload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Upload Trip Photos"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginTop="24dp"
+        android:layout_alignParentTop="true"
         android:layout_marginStart="20dp"
-        android:textColor="#333"/>
+        android:layout_marginTop="24dp"
+        android:text="Upload Trip Photos"
+        android:textColor="#333"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
-    <!-- RecyclerView for showing selected images -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/photoRecyclerView"
         android:layout_width="match_parent"
@@ -33,7 +32,6 @@
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:spanCount="3" />
 
-    <!-- Floating Action Button to add photos -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addPhotosButton"
         android:layout_width="wrap_content"
@@ -46,7 +44,6 @@
         app:tint="@android:color/white"
         app:backgroundTint="@color/brown"/>
 
-    <!-- DONE button -->
     <Button
         android:id="@+id/doneButton"
         android:layout_width="match_parent"
