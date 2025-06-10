@@ -145,11 +145,13 @@ public class TripDetailsActivity extends AppCompatActivity {
                 .addOnSuccessListener(querySnapshot -> {
                     for (DocumentSnapshot dc : querySnapshot.getDocuments()) {
                         Photo photo = dc.toObject(Photo.class);
+                        photo.setTripId(tripId);
+                        photo.setPhotoId(dc.getId()); // ← Add this too!
+                        photo.setFavorite(dc.getBoolean("isFavorite") != null && dc.getBoolean("isFavorite"));
                         photoList.add(photo);
                     }
                     photoAdapter.notifyDataSetChanged();
                 });
-
     }
 
     @Override

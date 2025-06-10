@@ -24,7 +24,6 @@ public class TripPhotoAdapter extends RecyclerView.Adapter<TripPhotoAdapter.Phot
 
     private final List<Photo> photos;
     private final Context context;
-    private int favoritePosition = -1;
 
     public TripPhotoAdapter(Context context, List<Photo> photos) {
         this.context = context;
@@ -92,7 +91,7 @@ public class TripPhotoAdapter extends RecyclerView.Adapter<TripPhotoAdapter.Phot
             db.collection("users").document(user.getUid())
                     .collection("trips").document(p.getTripId())
                     .collection("photos").document(p.getPhotoId())
-                    .update("favorite", p == selectedPhoto);
+                    .update("isFavorite", p == selectedPhoto);
         }
     }
 

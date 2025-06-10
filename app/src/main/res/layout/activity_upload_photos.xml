@@ -1,34 +1,61 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/uploadPhotoLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="12dp"
-    android:background="#F9F7F2">
+    android:background="#FFFDF8">
 
-    <ImageButton
-        android:id="@+id/backButton"
+    <!-- Title -->
+    <TextView
+        android:id="@+id/titleUpload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/quantum_ic_arrow_back_grey600_24"
-        android:background="@android:color/transparent" />
+        android:text="Upload Trip Photos"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="20dp"
+        android:textColor="#333"/>
 
-    <Button
+    <!-- RecyclerView for showing selected images -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/photoRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_above="@+id/doneButton"
+        android:layout_below="@+id/titleUpload"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="20dp"
+        android:padding="12dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="3" />
+
+    <!-- Floating Action Button to add photos -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addPhotosButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="+ ADD PHOTOS"
-        android:layout_gravity="center_horizontal" />
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/doneButton"
+        app:srcCompat="@drawable/ic_add_photo"
+        app:tint="@android:color/white"
+        app:backgroundTint="@color/brown"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="12dp" />
-
+    <!-- DONE button -->
     <Button
         android:id="@+id/doneButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Done" />
-</LinearLayout>
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:text="DONE"
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:backgroundTint="#FFFDF8"
+        android:layout_margin="8dp"/>
+</RelativeLayout>

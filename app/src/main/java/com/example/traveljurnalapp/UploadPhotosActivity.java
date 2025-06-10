@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -40,7 +41,7 @@ public class UploadPhotosActivity extends AppCompatActivity {
     private static final int REQUEST_CODE = 1;
     private List<Uri> imageUris = new ArrayList<>();
     private PhotoAdapter adapter;
-    private Button addPhotosButton;
+    private FloatingActionButton addPhotosButton;
     private Button doneButton;
     private int favoritePosition;
     private String tripId;
@@ -58,7 +59,7 @@ public class UploadPhotosActivity extends AppCompatActivity {
         }
         favoritePosition = getIntent().getIntExtra("favoriteIndex", -1);
 
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = findViewById(R.id.photoRecyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         adapter = new PhotoAdapter(this, imageUris, new PhotoActionListener() {
             @Override
