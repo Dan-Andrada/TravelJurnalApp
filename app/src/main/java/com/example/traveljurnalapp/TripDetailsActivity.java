@@ -99,6 +99,10 @@ public class TripDetailsActivity extends AppCompatActivity {
             String dateText = displayFormat.format(startDate) + " - " + displayFormat.format(endDate) + " 2025";
             tripDates.setText(dateText);
         }
+        if(endDate == null){
+            String dateText = displayFormat.format(startDate)  + " 2025";
+            tripDates.setText(dateText);
+        }
 
 
         if (note != null && !note.isEmpty()) {
