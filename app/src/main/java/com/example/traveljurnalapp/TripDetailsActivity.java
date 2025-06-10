@@ -124,6 +124,7 @@ public class TripDetailsActivity extends AppCompatActivity {
     }
 
 
+
     private void viewImages(String tripId){
         List<Photo> photoList = new ArrayList<>();
         TripPhotoAdapter photoAdapter = new TripPhotoAdapter(this, photoList);

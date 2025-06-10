@@ -68,6 +68,7 @@ public class UploadPhotosActivity extends AppCompatActivity {
                 adapter.notifyItemRemoved(position);
             }
 
+
             @Override
             public void onFavoritePhoto(int position) {
                 adapter.promptFavoriteChange(position);

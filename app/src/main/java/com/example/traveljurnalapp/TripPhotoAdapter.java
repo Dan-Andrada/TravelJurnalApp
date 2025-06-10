@@ -96,6 +96,7 @@ public class TripPhotoAdapter extends RecyclerView.Adapter<TripPhotoAdapter.Phot
         }
     }
 
+
     private void deletePhotoFromFirebase(Photo photo, int position) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();

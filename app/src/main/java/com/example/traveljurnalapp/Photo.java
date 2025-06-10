@@ -7,7 +7,6 @@ public class Photo {
     private String photoId;
 
     public Photo() {
-        // Needed for Firestore
     }
 
     public String getUrl() {

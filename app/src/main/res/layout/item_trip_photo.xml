@@ -9,6 +9,7 @@
         android:layout_height="200dp"
         android:scaleType="centerCrop" />
 
+
     <ImageView
         android:id="@+id/removeIcon"
         android:layout_width="24dp"

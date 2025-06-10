@@ -119,6 +119,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
 
 }
 
+
 interface PhotoActionListener {
 
     void onRemovePhoto(int position);

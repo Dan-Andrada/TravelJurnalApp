@@ -141,6 +141,7 @@ public class AddTripDetailsActivity extends AppCompatActivity {
 
         });
 
+
         notesButton.setOnClickListener(view -> {
             Intent intent = new Intent(AddTripDetailsActivity.this, NotesActivity.class);
             intent.putExtra("tempNote", temporaryNote);
